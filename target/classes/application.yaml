@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: psxSabeSt0re
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: false
+  flyway:
+    enabled: true
+    locations: classpath:/flyway
+  h2:
+    console.enabled: true
+
+springdoc:
+  api-docs:
+    path: /apis
+    # for swagger ui use http://localhost:8080/swagger-ui/index.html
+
+properties:
+  hibernate:
+    hbm2ddl:
+      auto: none
+
+
+
+sabe:
+  phrase_of_the_day: "Nice to meet you, welcome at Sabe Store!"
