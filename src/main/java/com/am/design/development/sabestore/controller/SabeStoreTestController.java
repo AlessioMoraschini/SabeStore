@@ -21,7 +21,7 @@ public class SabeStoreTestController {
         String random = String.valueOf( new Random().nextInt());
 
         return ResponseEntity.status(HttpStatusCode.valueOf(518)).body(
-                new Response("I'm alive: hi " + name + "\r\n" + random + phrase, LocalDateTime.now())
+                new Response("I'm alive: hi " + name + System.lineSeparator() + random + phrase, LocalDateTime.now())
         );
     }
 
