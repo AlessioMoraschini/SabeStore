@@ -20,18 +20,14 @@ public class SabeStoreUserController {
     private UserFacade userFacade;
 
     @GetMapping("getUsers")
-    public ResponseEntity<List<UserDto>> healthCheck() {
+    public ResponseEntity<List<UserDto>> getUsers() {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
                 userFacade.getUsers()
         );
     }
 
-    private void testException(){
-        throw new RuntimeException("Just a test Exception ;)");
-    }
-
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler
     public ResponseEntity<String>  errorMapper(Exception exc){
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(exc.getMessage());
     }
