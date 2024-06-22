@@ -9,7 +9,10 @@ spring:
     defer-datasource-initialization: false
   flyway:
     enabled: true
-    locations: classpath:/flyway
+    locations: classpath:flyway/
+    flyway.url: ${spring.datasource.url}
+    flyway.password: ${spring.datasource.username}
+    flyway.user: ${spring.datasource.password}
   h2:
     console.enabled: true
 
@@ -27,3 +30,9 @@ properties:
 
 sabe:
   phrase_of_the_day: "Nice to meet you, welcome at Sabe Store!"
+
+logging:
+  level:
+    root: debug
+    web: info
+    sql: debug

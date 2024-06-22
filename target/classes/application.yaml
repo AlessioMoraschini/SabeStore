@@ -9,7 +9,10 @@ spring:
     defer-datasource-initialization: false
   flyway:
     enabled: true
-    locations: classpath:/flyway
+    locations: classpath:flyway/
+    flyway.url: ${spring.datasource.url}
+    flyway.password: ${spring.datasource.username}
+    flyway.user: ${spring.datasource.password}
   h2:
     console.enabled: true
 
