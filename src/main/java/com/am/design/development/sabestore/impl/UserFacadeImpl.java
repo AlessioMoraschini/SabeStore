@@ -21,12 +21,40 @@ public class UserFacadeImpl implements UserFacade {
     public List<UserDto> getUsers() {
         List<UserDto> userDtos = new ArrayList<>();
 
-        for(UserEntity ent : userRepository.findAll()){
+        for (UserEntity ent : userRepository.findAll()) {
             UserDto dto = new UserDto();
             BeanUtils.copyProperties(ent, dto);
             userDtos.add(dto);
         }
         return userDtos;
+    }
+
+    @Override
+    public UserDto addUser(UserDto userDto) {
+        var userFromDb = userRepository.getByNameAndSurnameAndAge(userDto.getName(), userDto.getSurname(), userDto.getAge());
+        if (userFromDb != null && !userFromDb.isEmpty()) {
+            throw new RuntimeException("At least one User already found in DB with same name, surname, and age");
+        }
+
+        var userEntity = UserEntity.builder()
+                .age(userDto.getAge())
+                .surname(userDto.getSurname())
+                .name(userDto.getName())
+                .build();
+
+        BeanUtils.copyProperties(userRepository.save(userEntity), userDto);
+        return userDto;
+    }
+
+    @Override
+    public UserDto removeById(Long id) {
+        var found = userRepository.getReferenceById(id);
+
+        userRepository.deleteById(id);
+
+        UserDto dto = new UserDto();
+        BeanUtils.copyProperties(found, dto);
+        return dto;
     }
 
     @Override
