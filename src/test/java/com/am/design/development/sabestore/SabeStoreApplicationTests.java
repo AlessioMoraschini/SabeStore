@@ -1,9 +1,9 @@
 package com.am.design.development.sabestore;
 
+import com.am.design.development.SabeTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SabeTest
 class SabeStoreApplicationTests {
 
 	@Test

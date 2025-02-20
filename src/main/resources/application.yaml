@@ -26,13 +26,25 @@ springdoc:
     path: /apis
     # for swagger ui use http://localhost:8080/swagger-ui/index.html
 
-
+libs:
+  path:
 
 sabe:
   phrase_of_the_day: "Nice to meet you, welcome at Sabe Store!"
+
+remote_retriever:
+  destination_folder: ./remote_retriever/tmp
+  wait_ms_before_delete: 30000
+
+task_executor:
+  core_pool_size: 1
+  max_pool_size: 2
 
 logging:
   level:
     root: info
     web: info
     sql: debug
+#    org.springframework.boot: DEBUG
+#    org.springframework.core.env: DEBUG
+#    org.springframework: DEBUG
