@@ -10,7 +10,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableAutoConfiguration
-@ComponentScan
+@ComponentScan(basePackages = {
+		"com.am.design.development.config",
+		"com.am.design.development.sabestore"
+})
 @EnableTransactionManagement
 @EnableJpaRepositories("com.am.design.development.sabestore.data.*")
 @EntityScan("com.am.design.development.sabestore.data.*")
