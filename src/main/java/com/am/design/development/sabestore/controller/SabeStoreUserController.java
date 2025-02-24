@@ -2,6 +2,7 @@ package com.am.design.development.sabestore.controller;
 
 import com.am.design.development.sabestore.dto.UserDto;
 import com.am.design.development.sabestore.facade.UserFacade;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.websocket.server.PathParam;
@@ -47,6 +48,11 @@ public class SabeStoreUserController {
     public ResponseEntity<String>  errorMapper(Exception exc){
 
         return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(exc.getClass().getCanonicalName() + ": " + exc.getMessage());
+    }
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    public ResponseEntity<String>  errorNotFoundMapper(Exception exc){
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(exc.getClass().getCanonicalName() + ": " + exc.getMessage());
     }
 
 }

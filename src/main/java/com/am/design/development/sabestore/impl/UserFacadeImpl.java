@@ -3,7 +3,11 @@ package com.am.design.development.sabestore.impl;
 import com.am.design.development.sabestore.data.entity.UserEntity;
 import com.am.design.development.sabestore.data.repository.UserRepository;
 import com.am.design.development.sabestore.dto.UserDto;
+import com.am.design.development.sabestore.dto.UserDtoFull;
 import com.am.design.development.sabestore.facade.UserFacade;
+import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +18,8 @@ import java.util.List;
 @Component
 public class UserFacadeImpl implements UserFacade {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserFacadeImpl.class);
+
     @Autowired
     private UserRepository userRepository;
 
@@ -22,7 +28,7 @@ public class UserFacadeImpl implements UserFacade {
         List<UserDto> userDtos = new ArrayList<>();
 
         for (UserEntity ent : userRepository.findAll()) {
-            UserDto dto = new UserDto();
+            UserDtoFull dto = new UserDtoFull();
             BeanUtils.copyProperties(ent, dto);
             userDtos.add(dto);
         }
@@ -42,8 +48,9 @@ public class UserFacadeImpl implements UserFacade {
                 .name(userDto.getName())
                 .build();
 
-        BeanUtils.copyProperties(userRepository.save(userEntity), userDto);
-        return userDto;
+        UserDtoFull response = new UserDtoFull();
+        BeanUtils.copyProperties(userRepository.save(userEntity), response);
+        return response;
     }
 
     @Override
@@ -52,8 +59,15 @@ public class UserFacadeImpl implements UserFacade {
 
         userRepository.deleteById(id);
 
-        UserDto dto = new UserDto();
-        BeanUtils.copyProperties(found, dto);
+        UserDtoFull dto = new UserDtoFull();
+        try {
+            found.getId(); // Will throw the exception if there is no entity found
+            BeanUtils.copyProperties(found, dto);
+        } catch (EntityNotFoundException e) {
+            LOGGER.error("User not found by id: {}", id);
+            throw new EntityNotFoundException("User not found by id: " + id);
+        }
+
         return dto;
     }
 

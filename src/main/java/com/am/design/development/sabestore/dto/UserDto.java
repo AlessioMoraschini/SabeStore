@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserDto {
-    Integer id;
     @NotNull
     @NotBlank
     @Pattern(regexp = ".{1,255}", message = "Invalid name length, must be between 1 and 255 characters")
