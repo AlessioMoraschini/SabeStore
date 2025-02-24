@@ -3,7 +3,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the fat jar to the container
-COPY target/*.jar app.jar
+COPY target/*.jar SabeStore.jar
 
 # Run the jar file
-ENTRYPOINT ["java", "-cp", "app.jar", "com.am.design.development.AmDesignDevelopmentApplication"]
+ENTRYPOINT ["java", "-jar", "SabeStore.jar"]
