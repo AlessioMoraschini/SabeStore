@@ -105,12 +105,6 @@
 
 		<!--   VIDEO CONVERSION	-->
 		<dependency>
-			<groupId>io.github.gaeqs</groupId>
-			<artifactId>JavaYoutubeDownloader</artifactId>
-			<version>LATEST</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.bytedeco</groupId>
 			<artifactId>ffmpeg</artifactId>
 			<version>7.1-1.5.11</version>
