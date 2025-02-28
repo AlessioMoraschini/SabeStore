@@ -35,6 +35,17 @@ management:
     health:
       show-details: always
 
+security:
+  unauthenticatedEndpoints:
+    - /actuator/**
+    - /v3/api-docs/**
+    - /swagger-ui/**
+    - /swagger-ui.html
+    - /swagger-resources/**
+    - /webjars
+    - /apis/**
+    - /login
+
 springdoc:
   api-docs:
     path: /apis

@@ -1,15 +1,19 @@
 package com.am.design.development.sabestore.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.util.Random;
 
 @RestController
 @RequestMapping("SabeStore")
+@SecurityRequirement(name = "bearerAuth")
 public class SabeStoreTestController {
 
     @Value("${sabe.phrase_of_the_day:null}")
@@ -18,10 +22,9 @@ public class SabeStoreTestController {
     @GetMapping("rualive")
     public ResponseEntity<Response> healthCheck(String name) {
 
-        String random = String.valueOf( new Random().nextInt());
 
         return ResponseEntity.status(HttpStatusCode.valueOf(518)).body(
-                new Response("I'm alive: hi " + name + System.lineSeparator() + random + phrase, LocalDateTime.now())
+                new Response("I'm alive: hi " + name + System.lineSeparator() + phrase, LocalDateTime.now())
         );
     }
 

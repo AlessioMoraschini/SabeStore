@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+            JWT_SECRET = credentials('jwt-secret')
+        }
     stages {
         stage('Checkout') {
             steps {
@@ -33,7 +36,7 @@ pipeline {
             steps {
                 script {
                     // Avvia il nuovo container su una porta temporanea e ottieni l'ID del nuovo container
-                    def newContainerId = sh(script: 'docker run -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 sabestore:latest', returnStdout: true).trim()
+                    def newContainerId = sh(script: 'docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 sabestore:latest', returnStdout: true).trim()
                     echo "New container started with ID: ${newContainerId} on port 8082"
 
                     // Salva l'ID del nuovo container in un file per riferimento
@@ -88,7 +91,7 @@ pipeline {
                     def newContainerId = readFile('newContainerId.txt').trim()
                     sh "docker stop ${newContainerId}"
                     sh "docker rm ${newContainerId}"
-                    sh "docker run -d -p 8081:8081 -e SERVER_PORT=8081 --network mynetwork --name sabestore sabestore:latest"
+                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8081:8081 -e SERVER_PORT=8081 --network mynetwork --name sabestore sabestore:latest"
                 }
             }
         }

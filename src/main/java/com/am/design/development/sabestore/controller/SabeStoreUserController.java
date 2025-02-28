@@ -2,6 +2,7 @@ package com.am.design.development.sabestore.controller;
 
 import com.am.design.development.sabestore.dto.UserDto;
 import com.am.design.development.sabestore.facade.UserFacade;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("user")
+@SecurityRequirement(name = "bearerAuth")
 public class SabeStoreUserController {
 
     @Autowired
