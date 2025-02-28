@@ -10,6 +10,7 @@ import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -31,6 +32,7 @@ public class SabeStoreUserController {
         );
     }
     @PutMapping("createUser")
+    @PreAuthorize("hasRole('ROLE_SUPERUSER')")
     public ResponseEntity<UserDto> createUser(@Valid UserDto userDto) {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
@@ -39,6 +41,7 @@ public class SabeStoreUserController {
     }
 
     @DeleteMapping("deleteUser/{id}")
+    @PreAuthorize("hasRole('ROLE_SUPERUSER')")
     public ResponseEntity<UserDto> createUser(@PathParam("id") @NotNull Long id) throws AccountNotFoundException {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
