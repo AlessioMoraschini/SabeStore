@@ -1,7 +1,7 @@
 package com.am.design.development.sabestore.impl;
 
-import com.am.design.development.sabestore.data.entity.UserEntity;
-import com.am.design.development.sabestore.data.repository.UserRepository;
+import com.am.design.development.data.userdb.entity.UserEntity;
+import com.am.design.development.data.userdb.repository.UserRepository;
 import com.am.design.development.sabestore.dto.UserDto;
 import com.am.design.development.sabestore.dto.UserDtoFull;
 import com.am.design.development.sabestore.facade.UserFacade;
