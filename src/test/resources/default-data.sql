@@ -1,0 +1,3 @@
+INSERT INTO DEF_TEST_TABLE (id, test) VALUES (1, 'ASD');
+INSERT INTO DEF_TEST_TABLE (id, test) VALUES (2, 'asdasd');
+INSERT INTO DEF_TEST_TABLE (id, test) VALUES (3, 'wewe');

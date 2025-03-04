@@ -2,21 +2,28 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration
   datasource:
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password: psxSabeSt0re
-    driverClassName: org.h2.Driver
+    user:
+      url: jdbc:h2:mem:userDB
+      jdbc-url: ${spring.datasource.user.url}
+      username: sa
+      password: psxSabeSt0re
+      driverClassName: org.h2.Driver
+    default:
+      url: jdbc:h2:mem:defaultDB
+      jdbc-url: ${spring.datasource.default.url}
+      username: sa
+      password: psxSabeSt0reDefault
+      driverClassName: org.h2.Driver
   jpa:
+    properties:
+        hibernate:
+            dialect: org.hibernate.dialect.H2Dialect
     database-platform: org.hibernate.dialect.H2Dialect
     defer-datasource-initialization: false
     hibernate:
       ddlauto: none
   flyway:
-    enabled: true
-    locations: classpath:flyway/
-    flyway.url: ${spring.datasource.url}
-    flyway.password: ${spring.datasource.username}
-    flyway.user: ${spring.datasource.password}
+    enabled: false
   h2:
     console.enabled: true
   devtools:
