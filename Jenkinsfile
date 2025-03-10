@@ -10,11 +10,6 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/AlessioMoraschini/SabeStore.git'
             }
         }
-        stage('Set Permissions') {
-            steps {
-                sh 'chmod +x ./mvnw'
-            }
-        }
         stage('Build') {
             steps {
                 script {
@@ -91,7 +86,7 @@ pipeline {
                     def newContainerId = readFile('newContainerId.txt').trim()
                     sh "docker stop ${newContainerId}"
                     sh "docker rm ${newContainerId}"
-                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8081:8081 -e SERVER_PORT=8081 --network mynetwork --name sabestore sabestore:latest"
+                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name sabestore sabestore:latest"
                 }
             }
         }

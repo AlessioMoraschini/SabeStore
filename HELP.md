@@ -17,6 +17,9 @@ The following guides illustrate how to use some features concretely:
 * [Validation](https://spring.io/guides/gs/validating-form-input/)
 * [Messaging with JMS](https://spring.io/guides/gs/messaging-jms/)
 
+### Jira tasks for the project
+* [Jira tasks](https://alessiomora91.atlassian.net/jira/software/projects/AM/boards/1)
+
 ### Swagger page
 ``` 
 java -jar target/sabe-store-0.0.1-SNAPSHOT.jar -Dserver.port=8080 
@@ -73,7 +76,9 @@ Actuator url: http://localhost:8080/actuator
 8. #### Run the pipeline and it should build the software, the image, and deploy the latest replacing the existing one!  
 
 
-
+9. #### Security and authentication/authorization
+   ... TODO explain how to use /login and bearer jwt token to access the endpoints
+10. 
 
    
 
