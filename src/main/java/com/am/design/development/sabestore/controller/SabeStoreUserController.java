@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("user")
-@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "bearerAuth") // For swagger
 public class SabeStoreUserController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class SabeStoreUserController {
 
     @DeleteMapping("deleteUser/{id}")
     @PreAuthorize("hasRole('ROLE_SUPERUSER')")
-    public ResponseEntity<UserDto> createUser(@PathParam("id") @NotNull Long id) throws AccountNotFoundException {
+    public ResponseEntity<UserDto> deleteUser(@PathParam("id") @NotNull Long id) throws AccountNotFoundException {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
                 userFacade.removeById(id)

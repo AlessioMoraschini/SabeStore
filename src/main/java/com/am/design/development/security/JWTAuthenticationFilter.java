@@ -24,13 +24,12 @@ import java.util.stream.Collectors;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private AuthenticationManager authenticationManager;
     private static long EXPIRATION_TIME = 600L;
 
     private static final String SECRET = System.getenv("JWT_SECRET");
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
+        super(authenticationManager);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             AuthRequest creds = new ObjectMapper()
                     .readValue(req.getInputStream(), AuthRequest.class);
 
-            return authenticationManager.authenticate(
+            return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             creds.getUsername(),
                             creds.getPassword()));
@@ -55,7 +54,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String token = Jwts.builder()
                 .setSubject(username)
-                .claim("roles", roles.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))                .setExpiration(Date.from(Instant.now().plus(EXPIRATION_TIME, ChronoUnit.SECONDS)))
+                .claim("roles", roles.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .setExpiration(Date.from(Instant.now().plus(EXPIRATION_TIME, ChronoUnit.SECONDS)))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
         res.addHeader("Authorization", "Bearer " + token);

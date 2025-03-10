@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     List<UserEntity> getByNameAndSurname(String name, String surname);
     List<UserEntity> getByNameAndSurnameAndAge(String name, String surname, Integer age);
 
+    UserEntity getByMail(String mail);
+
 }
