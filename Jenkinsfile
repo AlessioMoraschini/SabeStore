@@ -3,7 +3,6 @@ pipeline {
     environment {
         JWT_SECRET = credentials('jwt-secret')
         BRANCH = "${env.BRANCH_NAME ?: 'main'}"
-        PROJECT_VERSION = ""
     }
     stages {
         stage('Checkout') {
@@ -20,8 +19,11 @@ pipeline {
                     docker.image('maven:3.8.4-openjdk-17').inside("-v maven-repo:/root/.m2") {
                         sh 'mvn -version'
                         sh 'mvn clean package'
-                        def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
-                        env.PROJECT_VERSION = version
+                        script {
+                            def projectVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                            echo "Extracted project version: ${projectVersion}"
+                            env.PROJECT_VERSION = projectVersion
+                        }
                     }
                 }
                 echo "Project version: ${env.PROJECT_VERSION}"
@@ -41,6 +43,7 @@ pipeline {
             steps {
                 script {
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
+                    echo "Building Docker image with tag: ${imageName}"
                     sh "docker build -t ${imageName} ."
                 }
             }
@@ -49,11 +52,9 @@ pipeline {
             steps {
                 script {
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
-                    // Start new container on temporary port 8082 and get new container id
+                    echo "Deploying Docker image: ${imageName}"
                     def newContainerId = sh(script: 'docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}', returnStdout: true).trim()
                     echo "New container started with ID: ${newContainerId} on port 8082"
-
-                    // Salva l'ID del nuovo container in un file per riferimento
                     writeFile file: 'newContainerId.txt', text: newContainerId
                 }
             }
@@ -61,7 +62,6 @@ pipeline {
         stage('Health Check') {
             steps {
                 script {
-                    // Verifica che la nuova istanza sia operativa
                     def maxAttempts = 10
                     def waitTime = 5
                     def newContainerRunning = false
