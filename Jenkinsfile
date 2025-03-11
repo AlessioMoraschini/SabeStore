@@ -122,7 +122,9 @@ pipeline {
                     echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) in the volume..."
                     sh "ls -la ${env.WORKSPACE}"
                     sh "ls -la ${env.WORKSPACE}/SabeStore-${env.PROJECT_VERSION}.jar"
-                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v ${env.WORKSPACE}:/local busybox sh -c 'ls -la /local && sleep 120 && cp /local/SabeStore-${env.PROJECT_VERSION}.jar /app/'"
+                    def jenkinsFolder = sh(script: "echo ${env.BRANCH_NAME} | sed 's|/|_|g'", returnStdout: true).trim()
+                    def jenkinsFolderFull = workspace/${jenkinsFolder}
+                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v DockerVolume:/local busybox sh -c 'ls -la /local && sleep 120 && cp /local/${jenkinsFolderFull}/SabeStore-${env.PROJECT_VERSION}.jar /app/'"
                     sh "docker stop temp-container"
 
                     // Restart new container on original port 8081
