@@ -28,12 +28,12 @@ public class FlywayConfiguration {
     public void migrateFlyway() {
         Flyway flywayUser = Flyway.configure()
                 .dataSource(userDataSourceUrl, userDataSourceUsername, userDataSourcePassword)
-                .locations("filesystem:./src/main/resources/flyway/user")
+                .locations("classpath:flyway/user")
                 .load();
 
         Flyway flywayDefault = Flyway.configure()
                 .dataSource(defaultDataSourceUrl, defaultDataSourceUsername, defaultDataSourcePassword)
-                .locations("filesystem:./src/main/resources/flyway/default")
+                .locations("classpath:flyway/default")
                 .load();
 
         flywayUser.migrate();
