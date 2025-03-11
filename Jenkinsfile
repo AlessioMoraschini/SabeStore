@@ -115,12 +115,13 @@ pipeline {
                     def newContainerId = readFile('newContainerId.txt').trim()
                     echo "newContainerId is: ${newContainerId}"
 
-                    // Step 1: Start new temp container with mounted volume
-                    sh "docker run --rm -v AmDesignApplicationVolume:/app --name temp-container busybox true"
+                    // Step 1:Use docker cp to copy the jar from running container with deployed app to the temp container (copy to volume)
+                    echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) to local..."
+                    sh "docker cp ${newContainerId}:/app/SabeStore-${env.PROJECT_VERSION}.jar ."
+                    // Step 2: Start new temp container with mounted volume
                     echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) in the volume..."
-                    // Step 2:Use docker cp to copy the jar from running container with deployed app to the temp container (copy to volume)
-                    sh "docker cp ${newContainerId}:/app/SabeStore-${env.PROJECT_VERSION}.jar temp-container:/app/"
-                    docker rm temp-container
+                    sh "docker run --rm -v AmDesignApplicationVolume:/app --name temp-container -v $(pwd):/local busybox cp /local/SabeStore-${env.PROJECT_VERSION}.jar /app/"
+                    sh "docker stop temp-container"
 
                     // Restart new container on original port 8081
                     sh "docker stop ${newContainerId}"
