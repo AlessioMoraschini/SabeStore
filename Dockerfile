@@ -6,7 +6,7 @@ WORKDIR /app
 ENV JWT_SECRET=${JWT_SECRET}
 
 # Copy the fat jar to the container
-COPY target/*.jar SabeStore.jar
+COPY target/*.jar SabeStore-${PROJECT_VERSION}.jar
 
 # Run the jar file
-ENTRYPOINT ["java", "-jar", "SabeStore.jar"]
+ENTRYPOINT ["java", "-jar", "SabeStore-${PROJECT_VERSION}.jar"]
