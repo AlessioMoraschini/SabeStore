@@ -95,6 +95,9 @@ public class UserFacadeImpl implements UserFacade {
 
         UserDtoFull response = new UserDtoFull();
         BeanUtils.copyProperties(userRepository.save(userEntity), response);
+        response.setRoles(roleEntities.stream()
+                .map(RoleEntity::getRole)
+                .collect(Collectors.toSet()));
         response.setPassword("********");
         return response;
     }

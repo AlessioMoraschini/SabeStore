@@ -11,6 +11,9 @@ pipeline {
             }
         }
         stage('Build') {
+            when {
+                branch 'release/*'
+            }
             steps {
                 script {
                     docker.image('maven:3.8.4-openjdk-17').inside("-v maven-repo:/root/.m2") {
@@ -23,15 +26,29 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t sabestore:latest .'
+                    def jarVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    def imageName = "sabestore:${jarVersion}"
+                    sh 'docker build -t ${imageName} .'
+                }
+            }
+        }
+        stage('Check Branch and Stop Pipeline if Not Release') {
+            steps {
+                script {
+                    if (!env.BRANCH_NAME.startsWith('release/')) {
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
                 }
             }
         }
         stage('Deploy New Container') {
             steps {
                 script {
-                    // Avvia il nuovo container su una porta temporanea e ottieni l'ID del nuovo container
-                    def newContainerId = sh(script: 'docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 sabestore:latest', returnStdout: true).trim()
+                    def jarVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    def imageName = "sabestore:${jarVersion}"
+                    // Start new container on temporary port 8082 and get new container id
+                    def newContainerId = sh(script: 'docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}', returnStdout: true).trim()
                     echo "New container started with ID: ${newContainerId} on port 8082"
 
                     // Salva l'ID del nuovo container in un file per riferimento
@@ -82,11 +99,13 @@ pipeline {
         stage('Reassign Port') {
             steps {
                 script {
-                    // Riavvia il nuovo container con la porta originale
+                    def jarVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    def imageName = "sabestore:${jarVersion}"
+                    // Restart new container on original port 8081
                     def newContainerId = readFile('newContainerId.txt').trim()
                     sh "docker stop ${newContainerId}"
                     sh "docker rm ${newContainerId}"
-                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name sabestore sabestore:latest"
+                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name ${imageName} ${imageName}"
                 }
             }
         }

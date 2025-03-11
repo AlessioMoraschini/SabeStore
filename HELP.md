@@ -41,7 +41,7 @@ Actuator url: http://localhost:8080/actuator
     ``` docker volume create DockerVolume ```
 4. #### Create custom network for the containers
     ``` docker network create mynetwork ```
-5. #### Create Dockerfile if missing (already defined in the project)
+5. #### Create Docker image for jenkins
    ```
     FROM jenkins/jenkins:lts 
     USER root
@@ -58,7 +58,7 @@ Actuator url: http://localhost:8080/actuator
    ``` 
    docker exec -it --user root jenkins /bin/bash
    ls -l /var/run/docker.sock
-       Dovrebbe mostrare qualcosa del genere:
+       Should show something like this:
            srw-rw---- 1 root docker 0 Apr  6 10:43 /var/run/docker.sock
    chmod 660 /var/run/docker.sock
    groupadd docker
@@ -73,11 +73,16 @@ Actuator url: http://localhost:8080/actuator
    * Docker Plugin and Docker Pipeline
    * Create new pipeline ("New Item" and select "Pipeline").
    * Configure the pipeline with the script defined in Jenkinsfile
-8. #### Run the pipeline and it should build the software, the image, and deploy the latest replacing the existing one!  
-
+   * define credentials for jwt-secret (used in pipeline, see Jenkinsfile)
+8. #### Run the pipeline 
+   it should build the software, the image, and deploy the latest replacing the existing one!  
 
 9. #### Security and authentication/authorization
-   ... TODO explain how to use /login and bearer jwt token to access the endpoints
+   * security can be enabled/disabled using jvm args  ```-Dsecurity.enabled=true```
+   * if enabled, security allows to login using the mail/password (crypted with Bcrypt) set in user database.  
+   Just call the /login endpoint with username(mail) and password(plain text) matching a valid entry in the DB to receive back a 200 response with Authorization header.
+   Then you can use that header in the following requests to be recognized as logged in user. Then, depending on the associated role you can be authorized or not for the various endpoints.
+   
 10. 
 
    
