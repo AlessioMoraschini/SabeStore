@@ -51,6 +51,14 @@ pipeline {
         stage('Deploy New Container') {
             steps {
                 script {
+                    // Fond ID of the container in execution on port 8082
+                    def oldTempContainerId = sh(script: "docker ps --filter publish=8082 | grep '0.0.0.0:8082->8082/tcp' | awk '{print \$1}'", returnStdout: true).trim()
+                    // If found, stop and remove it
+                    if (oldTempContainerId) {
+                        sh "docker stop ${oldTempContainerId}"
+                        sh "docker rm ${oldTempContainerId}"
+                    }
+
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
                     echo "Deploying Docker image: ${imageName}"
                     def newContainerId = sh(script: "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}", returnStdout: true).trim()
@@ -104,16 +112,17 @@ pipeline {
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
                     def imageNameContainer = "sabestore_${env.PROJECT_VERSION}".toLowerCase()
                     echo "Syntax-corrected image container name is: ${imageNameContainer}"
+                    def newContainerId = readFile('newContainerId.txt').trim()
+                    echo "newContainerId is: ${newContainerId}"
 
                     // Step 1: Start new temp container with mounted volume
                     sh "docker run --rm -v AmDesignApplicationVolume:/app --name temp-container busybox true"
-                    echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) to in the volume..."
+                    echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) in the volume..."
                     // Step 2:Use docker cp to copy the jar from running container with deployed app to the temp container (copy to volume)
                     sh "docker cp ${newContainerId}:/app/SabeStore-${env.PROJECT_VERSION}.jar temp-container:/app/"
                     docker rm temp-container
 
                     // Restart new container on original port 8081
-                    def newContainerId = readFile('newContainerId.txt').trim()
                     sh "docker stop ${newContainerId}"
                     sh "docker rm ${newContainerId}"
                     sh "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name ${imageNameContainer} ${imageName}"
