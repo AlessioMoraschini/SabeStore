@@ -23,7 +23,7 @@ pipeline {
                         env.PROJECT_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
                     }
                 }
-                echo "Project version: ${env.PROJECT_VERSION}"
+                echo "Project version: ${PROJECT_VERSION}"
             }
         }
         stage('Check Branch and Stop Pipeline if Not Release') {
@@ -39,7 +39,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def imageName = "sabestore:${env.PROJECT_VERSION}"
+                    def imageName = "sabestore:${PROJECT_VERSION}"
                     sh "docker build -t ${imageName} ."
                 }
             }
@@ -47,7 +47,7 @@ pipeline {
         stage('Deploy New Container') {
             steps {
                 script {
-                    def imageName = "sabestore:${env.PROJECT_VERSION}"
+                    def imageName = "sabestore:${PROJECT_VERSION}"
                     // Start new container on temporary port 8082 and get new container id
                     def newContainerId = sh(script: 'docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}', returnStdout: true).trim()
                     echo "New container started with ID: ${newContainerId} on port 8082"
@@ -100,7 +100,7 @@ pipeline {
         stage('Reassign Port') {
             steps {
                 script {
-                    def imageName = "sabestore:${env.PROJECT_VERSION}"
+                    def imageName = "sabestore:${PROJECT_VERSION}"
                     // Restart new container on original port 8081
                     def newContainerId = readFile('newContainerId.txt').trim()
                     sh "docker stop ${newContainerId}"
