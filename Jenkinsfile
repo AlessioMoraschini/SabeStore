@@ -101,7 +101,7 @@ pipeline {
         stage('Reassign Port') {
             steps {
                 script {
-                    def imageName = "sabestore:${env.PROJECT_VERSION}"
+                    def imageName = "sabestore_${env.PROJECT_VERSION}"
                     // Restart new container on original port 8081
                     def newContainerId = readFile('newContainerId.txt').trim()
                     sh "docker stop ${newContainerId}"
