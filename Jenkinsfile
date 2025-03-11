@@ -101,12 +101,14 @@ pipeline {
         stage('Reassign Port') {
             steps {
                 script {
-                    def imageName = "sabestore_${env.PROJECT_VERSION}"
+                    def imageName = "sabestore:${env.PROJECT_VERSION}"
+                    def imageNameContainer = "sabestore_${env.PROJECT_VERSION}".toLowerCase()
+                    echo "Syntax-corrected image container name is: ${imageNameContainer}"
                     // Restart new container on original port 8081
                     def newContainerId = readFile('newContainerId.txt').trim()
                     sh "docker stop ${newContainerId}"
                     sh "docker rm ${newContainerId}"
-                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name ${imageName} ${imageName}"
+                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name ${imageNameContainer} ${imageName}"
                 }
             }
         }
