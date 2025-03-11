@@ -7,6 +7,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 def branch = env.GIT_BRANCH ?: 'main'
+                echo $branch
                 sh 'ls -la'
                 git branch: '${branch}', url: 'https://github.com/AlessioMoraschini/SabeStore.git'
             }
