@@ -53,7 +53,7 @@ pipeline {
                 script {
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
                     echo "Deploying Docker image: ${imageName}"
-                    def newContainerId = sh(script: 'docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}', returnStdout: true).trim()
+                    def newContainerId = sh(script: "docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}", returnStdout: true).trim()
                     echo "New container started with ID: ${newContainerId} on port 8082"
                     writeFile file: 'newContainerId.txt', text: newContainerId
                 }
