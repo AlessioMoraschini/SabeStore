@@ -42,9 +42,18 @@ pipeline {
                 }
             }
         }
-        if(currentBuild.result == 'SUCCESS') {
-            return //this will exit the pipeline
+    }
+    post {
+        success {
+            script {
+                if (currentBuild.result == 'SUCCESS' && !env.BRANCH_NAME.startsWith('release/')) {
+                    echo "Exiting pipeline gracefully as this is not a release branch."
+                    return // This will exit the pipeline
+                }
+            }
         }
+    }
+    stages {
         stage('Build Docker Image') {
             steps {
                 script {
