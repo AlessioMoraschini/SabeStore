@@ -9,8 +9,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public void login(@RequestBody AuthRequest authRequest) {
-        // Questo metodo non ha bisogno di implementazione
-        // Viene intercettato da JWTAuthenticationFilter
+        // No implementation needed, managed by JWTAuthenticationFilter
     }
 
 }

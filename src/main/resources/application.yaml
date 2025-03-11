@@ -17,9 +17,11 @@ spring:
   jpa:
     properties:
         hibernate:
-            dialect: org.hibernate.dialect.H2Dialect
+          format_sql: true
+          dialect: org.hibernate.dialect.H2Dialect
     database-platform: org.hibernate.dialect.H2Dialect
     defer-datasource-initialization: false
+    show-sql: false
     hibernate:
       ddlauto: none
   flyway:
@@ -82,6 +84,7 @@ logging:
     root: info
     web: info
     sql: debug
+#    org.hibernate: trace
 #    org.springframework.boot: DEBUG
 #    org.springframework.core.env: DEBUG
 #    org.springframework: DEBUG

@@ -8,7 +8,9 @@ import java.util.List;
 public interface UserFacade {
 
     List<UserDto>  getUsers();
+    UserDto  getCurrentUserDetails(String mail);
     UserDto  addUser(UserDto userDto);
+    UserDto  updateUser(UserDto userDto, boolean isSuperUser);
     UserDto  removeById(Long id) throws AccountNotFoundException;
     List<UserDto>  getUsersByFilter(UserDto userFilter);
 }

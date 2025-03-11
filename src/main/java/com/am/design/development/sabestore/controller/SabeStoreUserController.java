@@ -7,10 +7,13 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.websocket.server.PathParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -25,10 +28,22 @@ public class SabeStoreUserController {
     private UserFacade userFacade;
 
     @GetMapping("getUsers")
+    @PreAuthorize("hasRole('ROLE_SUPERUSER')")
     public ResponseEntity<List<UserDto>> getUsers() {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
                 userFacade.getUsers()
+        );
+    }
+
+    @GetMapping("getCurrentUserDetails")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<UserDto> getCurrentUserDetails() {
+
+        String loggedUserMail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
+                userFacade.getCurrentUserDetails(loggedUserMail)
         );
     }
     @PutMapping("createUser")
@@ -38,6 +53,34 @@ public class SabeStoreUserController {
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
                 userFacade.addUser(userDto)
         );
+    }
+
+    @PostMapping("updateUser")
+    @PreAuthorize("hasRole('ROLE_SUPERUSER')")
+    public ResponseEntity<UserDto> updateUser(@Valid UserDto userDto) {
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
+                userFacade.updateUser(userDto, true)
+        );
+    }
+
+    @PostMapping("updateLoggedUser")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<UserDto> updateLoggedUser(@Valid UserDto userDto) {
+
+        verifyLoggedUser(userDto.getMail());
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
+                userFacade.updateUser(userDto, false)
+        );
+    }
+
+    private void verifyLoggedUser(String mail){
+        // Let's check the user mail to see if it matches the one passed in the DTO
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(!StringUtils.equals(authentication.getName(), mail)){
+            throw new RuntimeException("Logged user mail does not match the one passed in the DTO, you can only update your own based on your profile role of type USER.");
+        }
     }
 
     @DeleteMapping("deleteUser/{id}")

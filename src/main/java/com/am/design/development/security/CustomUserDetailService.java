@@ -18,14 +18,16 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
-        UserEntity sabeUser = userRepository.getByMail(mail);
+        UserEntity sabeUser = userRepository.findByMail(mail);
         if (sabeUser == null) {
             throw new UsernameNotFoundException("User not found");
         }
 
         UserBuilder builder = User.withUsername(sabeUser.getMail());
         builder.password(sabeUser.getPassword());
-        builder.roles(sabeUser.getUserRole().getRole().name());
+        builder.roles(sabeUser.getRoles().stream()
+                .map(role -> role.getRole().name())
+                .toArray(String[]::new));
 
         return builder.build();
     }
