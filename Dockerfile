@@ -3,6 +3,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Set environment variables
+ARG PROJECT_VERSION
 ENV JWT_SECRET=${JWT_SECRET}
 
 # Copy the fat jar to the container

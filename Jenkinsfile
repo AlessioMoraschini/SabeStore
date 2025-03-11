@@ -44,7 +44,7 @@ pipeline {
                 script {
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
                     echo "Building Docker image with tag: ${imageName}"
-                    sh "docker build -t ${imageName} ."
+                    sh "docker build --build-arg PROJECT_VERSION=${env.PROJECT_VERSION} -t ${imageName} ."
                 }
             }
         }
