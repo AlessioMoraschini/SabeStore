@@ -125,9 +125,9 @@ pipeline {
                     def jenkinsFolder = sh(script: "echo ${env.BRANCH_NAME} | sed 's|/|_|g'", returnStdout: true).trim()
                     echo "jenkinsFolder: ${jenkinsFolder}"
                     def jenkinsFolderFull = "workspace/pipeline_${jenkinsFolder}"
+                    def jarToCopy = "/local/${jenkinsFolderFull}/SabeStore-${env.PROJECT_VERSION}.jar"
                     echo "jenkinsFolderFull: ${jenkinsFolderFull}"
-                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v DockerVolume:/local busybox sh -c 'ls -la /local && cp /local/${jenkinsFolderFull}/SabeStore-${env.PROJECT_VERSION}.jar /app/'"
-                    sh "docker stop temp-container"
+                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v DockerVolume:/local busybox sh -c 'ls -la /local && rm -f /app/SabeStore-${env.PROJECT_VERSION}.jar && cp ${jarToCopy} /app/'"
 
                     // Restart new container on original port 8081
                     sh "docker stop ${newContainerId}"
