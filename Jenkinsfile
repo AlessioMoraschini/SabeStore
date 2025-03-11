@@ -2,35 +2,23 @@ pipeline {
     agent any
     environment {
             JWT_SECRET = credentials('jwt-secret')
+            BRANCH = "${env.GIT_BRANCH ?: 'main'}"
         }
     stages {
         stage('Checkout') {
             steps {
-                def branch = env.GIT_BRANCH ?: 'main'
-                echo $branch
+                echo ${BRANCH}
                 sh 'ls -la'
-                git branch: '${branch}', url: 'https://github.com/AlessioMoraschini/SabeStore.git'
+                git branch: '${BRANCH}', url: 'https://github.com/AlessioMoraschini/SabeStore.git'
             }
         }
         stage('Build') {
-            when {
-                branch 'release/*'
-            }
             steps {
                 script {
                     docker.image('maven:3.8.4-openjdk-17').inside("-v maven-repo:/root/.m2") {
                         sh 'mvn -version'
                         sh 'mvn clean package'
                     }
-                }
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    def jarVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
-                    def imageName = "sabestore:${jarVersion}"
-                    sh 'docker build -t ${imageName} .'
                 }
             }
         }
@@ -41,6 +29,15 @@ pipeline {
                         currentBuild.result = 'SUCCESS'
                         return
                     }
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def jarVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    def imageName = "sabestore:${jarVersion}"
+                    sh 'docker build -t ${imageName} .'
                 }
             }
         }
