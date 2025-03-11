@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Set environment variables
 ARG PROJECT_VERSION
+ENV PROJECT_VERSION=${PROJECT_VERSION}
 ENV JWT_SECRET=${JWT_SECRET}
 
 # Copy the fat jar to the container

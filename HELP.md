@@ -71,8 +71,9 @@ Actuator url: http://localhost:8080/actuator
    * Git Plugin
    * Pipeline Plugin
    * Docker Plugin and Docker Pipeline
-   * Create new pipeline ("New Item" and select "Pipeline").
+   * Create new multibranch pipeline ("New Item" and select "Multibranch Pipeline").
    * Configure the pipeline with the script defined in Jenkinsfile
+   * Configure the pipeline to use git https URL, and exclude unused branches (e.g. keep only "main release*")
    * define credentials for jwt-secret (used in pipeline, see Jenkinsfile)
 8. #### Run the pipeline 
    it should build the software, the image, and deploy the latest replacing the existing one!  
