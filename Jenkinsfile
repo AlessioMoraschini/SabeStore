@@ -20,10 +20,11 @@ pipeline {
                     docker.image('maven:3.8.4-openjdk-17').inside("-v maven-repo:/root/.m2") {
                         sh 'mvn -version'
                         sh 'mvn clean package'
-                        env.PROJECT_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                        def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                        env.PROJECT_VERSION = version
                     }
                 }
-                echo "Project version: ${PROJECT_VERSION}"
+                echo "Project version: ${env.PROJECT_VERSION}"
             }
         }
         stage('Check Branch and Stop Pipeline if Not Release') {
@@ -39,7 +40,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def imageName = "sabestore:${PROJECT_VERSION}"
+                    def imageName = "sabestore:${env.PROJECT_VERSION}"
                     sh "docker build -t ${imageName} ."
                 }
             }
@@ -47,7 +48,7 @@ pipeline {
         stage('Deploy New Container') {
             steps {
                 script {
-                    def imageName = "sabestore:${PROJECT_VERSION}"
+                    def imageName = "sabestore:${env.PROJECT_VERSION}"
                     // Start new container on temporary port 8082 and get new container id
                     def newContainerId = sh(script: 'docker run -e JWT_SECRET=${JWT_SECRET} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}', returnStdout: true).trim()
                     echo "New container started with ID: ${newContainerId} on port 8082"
@@ -100,7 +101,7 @@ pipeline {
         stage('Reassign Port') {
             steps {
                 script {
-                    def imageName = "sabestore:${PROJECT_VERSION}"
+                    def imageName = "sabestore:${env.PROJECT_VERSION}"
                     // Restart new container on original port 8081
                     def newContainerId = readFile('newContainerId.txt').trim()
                     sh "docker stop ${newContainerId}"
