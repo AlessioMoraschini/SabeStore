@@ -120,11 +120,13 @@ pipeline {
                     sh "docker cp ${newContainerId}:/app/SabeStore-${env.PROJECT_VERSION}.jar ."
                     // Step 2: Start new temp container with mounted volume
                     echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) in the volume..."
-                    sh "ls -la ${env.WORKSPACE}"
                     sh "ls -la ${env.WORKSPACE}/SabeStore-${env.PROJECT_VERSION}.jar"
-                    def jenkinsFolder = sh(script: "echo \${env.BRANCH_NAME} | sed 's|/|_|g'", returnStdout: true).trim()
+                    echo "BRANCH_NAME: ${env.BRANCH_NAME}"
+                    def jenkinsFolder = sh(script: "echo ${env.BRANCH_NAME} | sed 's|/|_|g'", returnStdout: true).trim()
+                    echo "jenkinsFolder: ${jenkinsFolder}"
                     def jenkinsFolderFull = "workspace/pipeline_${jenkinsFolder}"
-                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v DockerVolume:/local busybox sh -c 'ls -la /local && sleep 120 && cp /local/${jenkinsFolderFull}/SabeStore-${env.PROJECT_VERSION}.jar /app/'"
+                    echo "jenkinsFolderFull: ${jenkinsFolderFull}"
+                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v DockerVolume:/local busybox sh -c 'ls -la /local && cp /local/${jenkinsFolderFull}/SabeStore-${env.PROJECT_VERSION}.jar /app/'"
                     sh "docker stop temp-container"
 
                     // Restart new container on original port 8081
