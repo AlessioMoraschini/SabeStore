@@ -81,6 +81,8 @@ pipeline {
                     if (!newContainerRunning) {
                         error "New container failed to start within ${maxAttempts * waitTime} seconds."
                     }
+
+                    sleep(60)
                 }
             }
         }
