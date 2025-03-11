@@ -1,15 +1,16 @@
 pipeline {
     agent any
     environment {
-            JWT_SECRET = credentials('jwt-secret')
-            BRANCH = "${env.GIT_BRANCH ?: 'main'}"
-        }
+        JWT_SECRET = credentials('jwt-secret')
+        BRANCH = "${env.BRANCH_NAME ?: 'main'}"
+    }
     stages {
         stage('Checkout') {
             steps {
-                echo ${BRANCH}
-                sh 'ls -la'
-                git branch: '${BRANCH}', url: 'https://github.com/AlessioMoraschini/SabeStore.git'
+                script {
+                    sh 'ls -la'
+                    git branch: "${BRANCH}", url: 'https://github.com/AlessioMoraschini/SabeStore.git'
+                }
             }
         }
         stage('Build') {
@@ -37,7 +38,7 @@ pipeline {
                 script {
                     def jarVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
                     def imageName = "sabestore:${jarVersion}"
-                    sh 'docker build -t ${imageName} .'
+                    sh "docker build -t ${imageName} ."
                 }
             }
         }
