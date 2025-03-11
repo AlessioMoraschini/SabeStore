@@ -120,7 +120,7 @@ pipeline {
                     sh "docker cp ${newContainerId}:/app/SabeStore-${env.PROJECT_VERSION}.jar ."
                     // Step 2: Start new temp container with mounted volume
                     echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) in the volume..."
-                    sh "docker run --rm -v AmDesignApplicationVolume:/app --name temp-container -v ${pwd}:/local busybox cp /local/SabeStore-${env.PROJECT_VERSION}.jar /app/"
+                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v ${env.WORKSPACE}:/local busybox sh -c 'cp /local/SabeStore-${env.PROJECT_VERSION}.jar /app/'"
                     sh "docker stop temp-container"
 
                     // Restart new container on original port 8081
