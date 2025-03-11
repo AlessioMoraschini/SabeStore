@@ -11,4 +11,4 @@ ENV JWT_SECRET=${JWT_SECRET}
 COPY target/*.jar SabeStore-${PROJECT_VERSION}.jar
 
 # Run the jar file
-ENTRYPOINT ["java", "-jar", "SabeStore-${PROJECT_VERSION}.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar SabeStore-${PROJECT_VERSION}.jar"]
