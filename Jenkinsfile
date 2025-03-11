@@ -6,8 +6,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                def branch = env.GIT_BRANCH ?: 'main'
                 sh 'ls -la'
-                git branch: 'main', url: 'https://github.com/AlessioMoraschini/SabeStore.git'
+                git branch: '${branch}', url: 'https://github.com/AlessioMoraschini/SabeStore.git'
             }
         }
         stage('Build') {
