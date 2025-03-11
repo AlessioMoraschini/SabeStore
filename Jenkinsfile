@@ -33,11 +33,17 @@ pipeline {
             steps {
                 script {
                     if (!env.BRANCH_NAME.startsWith('release/')) {
+                        echo "Build stopped because the branch is not a release branch."
                         currentBuild.result = 'SUCCESS'
                         return
+                    } else {
+                        echo "Build continues because this is from a release branch."
                     }
                 }
             }
+        }
+        if(currentBuild.result == 'SUCCESS') {
+            return //this will exit the pipeline
         }
         stage('Build Docker Image') {
             steps {
