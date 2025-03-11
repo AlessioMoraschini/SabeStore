@@ -29,32 +29,10 @@ pipeline {
                 echo "Project version: ${env.PROJECT_VERSION}"
             }
         }
-        stage('Check Branch and Stop Pipeline if Not Release') {
-            steps {
-                script {
-                    if (!env.BRANCH_NAME.startsWith('release/')) {
-                        echo "Build stopped because the branch is not a release branch."
-                        currentBuild.result = 'SUCCESS'
-                        return
-                    } else {
-                        echo "Build continues because this is from a release branch."
-                    }
-                }
-            }
-        }
-    }
-    post {
-        success {
-            script {
-                if (currentBuild.result == 'SUCCESS' && !env.BRANCH_NAME.startsWith('release/')) {
-                    echo "Exiting pipeline gracefully as this is not a release branch."
-                    return // This will exit the pipeline
-                }
-            }
-        }
-    }
-    stages {
         stage('Build Docker Image') {
+            when {
+                expression { env.BRANCH_NAME.startsWith('release/') }
+            }
             steps {
                 script {
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
@@ -64,6 +42,9 @@ pipeline {
             }
         }
         stage('Deploy New Container') {
+            when {
+                expression { env.BRANCH_NAME.startsWith('release/') }
+            }
             steps {
                 script {
                     // Fond ID of the container in execution on port 8082
@@ -83,6 +64,9 @@ pipeline {
             }
         }
         stage('Health Check') {
+            when {
+                expression { env.BRANCH_NAME.startsWith('release/') }
+            }
             steps {
                 script {
                     def maxAttempts = 10
@@ -108,6 +92,9 @@ pipeline {
             }
         }
         stage('Stop Existing Container') {
+            when {
+                expression { env.BRANCH_NAME.startsWith('release/') }
+            }
             steps {
                 script {
                     // Trova l'ID del container in esecuzione sulla porta 8081
@@ -122,6 +109,9 @@ pipeline {
             }
         }
         stage('Reassign Port') {
+            when {
+                expression { env.BRANCH_NAME.startsWith('release/') }
+            }
             steps {
                 script {
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
