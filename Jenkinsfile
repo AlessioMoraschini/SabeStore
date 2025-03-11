@@ -106,8 +106,8 @@ pipeline {
                     echo "Syntax-corrected image container name is: ${imageNameContainer}"
 
                     // Step 1: Start new temp container with mounted volume
-                    docker run --rm -v AmDesignApplicationVolume:/app --name temp-container busybox true
-                    echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) to /app in the volume..."
+                    sh "docker run --rm -v AmDesignApplicationVolume:/app --name temp-container busybox true"
+                    echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) to in the volume..."
                     // Step 2:Use docker cp to copy the jar from running container with deployed app to the temp container (copy to volume)
                     sh "docker cp ${newContainerId}:/app/SabeStore-${env.PROJECT_VERSION}.jar temp-container:/app/"
                     docker rm temp-container
