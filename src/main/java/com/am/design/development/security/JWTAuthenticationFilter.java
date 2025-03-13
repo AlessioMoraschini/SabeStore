@@ -5,6 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +32,19 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
+        // in case of OPTIONS request it is a preflight request done by the browser to check CORS. This should not be analyzed by AuthFilter
+        if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest)request).getMethod())) {
+            ((HttpServletResponse)response).setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
+        // Il resto della logica di autenticazione
+        super.doFilter(request, response, chain);
     }
 
     @Override

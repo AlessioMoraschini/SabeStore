@@ -55,6 +55,8 @@ security:
     - /apis/**
     - /login
     - /h2-console/**
+  corsAllowedOrigins:
+    - "http://localhost:3000"
 
 springdoc:
   api-docs:

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class SecurityProperties {
     private String[] unauthenticatedEndpoints;
+    private String[] corsAllowedOrigins;
     @Value("${security.enabled:true}")
     private boolean enabled;
 }
