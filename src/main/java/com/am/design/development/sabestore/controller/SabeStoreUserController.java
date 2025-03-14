@@ -3,6 +3,7 @@ package com.am.design.development.sabestore.controller;
 import com.am.design.development.sabestore.dto.UserDto;
 import com.am.design.development.sabestore.facade.UserFacade;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -46,12 +47,39 @@ public class SabeStoreUserController {
                 userFacade.getCurrentUserDetails(loggedUserMail)
         );
     }
-    @PutMapping("createUser")
+    @PutMapping("createUserWithGrants")
     @PreAuthorize("hasRole('ROLE_SUPERUSER')")
-    public ResponseEntity<UserDto> createUser(@Valid UserDto userDto) {
+    public ResponseEntity<UserDto> createUserWithGrants(@Valid UserDto userDto) throws MessagingException {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
-                userFacade.addUser(userDto)
+                userFacade.addUser(userDto, true)
+        );
+    }
+    @PutMapping("createUser")
+    public ResponseEntity<UserDto> createUser(@Valid UserDto userDto) throws MessagingException {
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
+                userFacade.addUser(userDto, false)
+        );
+    }
+
+    @GetMapping("verifyUser")
+    public ResponseEntity<UserDto> verifyUser(
+            @RequestParam(name = "userRandomIdentifier") String userRandomIdentifier,
+            @RequestParam(name = "userId") Long userId
+    ) {
+
+        userFacade.verifyUser(userId, userRandomIdentifier);
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).build();
+    }
+
+    @GetMapping("resendVerificationMail")
+    public ResponseEntity<UserDto> resendVerificationMail(@RequestParam(name = "mail") String mail)
+            throws MessagingException {
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
+                userFacade.resendVerificationMail(mail)
         );
     }
 

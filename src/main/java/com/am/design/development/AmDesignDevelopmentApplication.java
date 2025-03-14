@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 @ComponentScan(basePackages = {
 		"com.am.design.development.config",
+		"com.am.design.development.utilities",
 		"com.am.design.development.sabestore"
 })
 @EnableTransactionManagement

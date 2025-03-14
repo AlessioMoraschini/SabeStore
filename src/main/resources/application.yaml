@@ -1,3 +1,5 @@
+# this configuration is the default one containing many test environment configs.
+# If you need to setup a qa or production environment, create a new profile and override the settings you need.
 spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration
@@ -14,6 +16,24 @@ spring:
       username: sa
       password: psxSabeSt0reDefault
       driverClassName: org.h2.Driver
+  mail:
+    host: smtps.aruba.it
+    port: 465
+    username: sabestore.test@am-design-development.com
+    # password: setup with injected secrets
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            enable: true
+            socketFactory:
+              class: javax.net.ssl.SSLSocketFactory
+              fallback: false
+
   jpa:
     properties:
         hibernate:
@@ -54,6 +74,8 @@ security:
     - /webjars
     - /apis/**
     - /login
+    - /user/createUser
+    - /user/verifyUser
     - /h2-console/**
   corsAllowedOrigins:
     - "http://localhost:3000"

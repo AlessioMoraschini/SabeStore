@@ -5,10 +5,15 @@ import com.am.design.development.data.userdb.entity.UserEntity;
 import com.am.design.development.data.userdb.repository.RoleRepository;
 import com.am.design.development.data.userdb.repository.UserRepository;
 import com.am.design.development.dto.UserRole;
+import com.am.design.development.dto.UserVerificationStatus;
 import com.am.design.development.sabestore.dto.UserDto;
 import com.am.design.development.sabestore.dto.UserDtoFull;
 import com.am.design.development.sabestore.facade.UserFacade;
+import com.am.design.development.utilities.impl.EmailService;
+import com.am.design.development.utilities.utils.WebAppUtils;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +38,11 @@ public class UserFacadeImpl implements UserFacade {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private WebAppUtils webAppUtils;
+
     @Override
     @Transactional(transactionManager = "userDbTransactionManager", readOnly = true)
     // TODO with pagination!
@@ -41,11 +51,7 @@ public class UserFacadeImpl implements UserFacade {
 
         for (UserEntity ent : userRepository.findAll()) {
             UserDtoFull dto = new UserDtoFull();
-            BeanUtils.copyProperties(ent, dto);
-            dto.setRoles(ent.getRoles().stream()
-                    .map(RoleEntity::getRole)
-                    .collect(Collectors.toSet()));
-            dto.setPassword("********");
+            copyUserFromEntityMaskingPsw(ent, dto);
             userDtos.add(dto);
         }
         return userDtos;
@@ -56,23 +62,20 @@ public class UserFacadeImpl implements UserFacade {
     public UserDto getCurrentUserDetails(String mail) {
         UserEntity ent = userRepository.findByMail(mail);
         UserDtoFull dto = new UserDtoFull();
-        BeanUtils.copyProperties(ent, dto);
-        dto.setRoles(ent.getRoles().stream()
-                .map(RoleEntity::getRole)
-                .collect(Collectors.toSet()));
-        dto.setPassword("********");
+        copyUserFromEntityMaskingPsw(ent, dto);
         return dto;
     }
 
     @Override
     @Transactional(transactionManager = "userDbTransactionManager")
-    public UserDto addUser(UserDto userDto) {
+    public UserDto addUser(UserDto userDto, boolean isSuperUser) throws MessagingException {
         var userFromDb = userRepository.findByMail(userDto.getMail());
         if (userFromDb != null) {
             throw new RuntimeException("At least one User already found in DB with same mail");
         }
 
         var roleEntities = userDto.getRoles().stream()
+                .filter(role -> isSuperUser || role.equals(UserRole.USER))
                 .map(role -> roleRepository.getByRole(role))
                 .peek(roleEntity -> {
                     if (roleEntity == null) {
@@ -91,15 +94,52 @@ public class UserFacadeImpl implements UserFacade {
                 .roles(roleEntities)
                 .password(hashedPsw)
                 .mail(userDto.getMail())
+                .verificationStatus(isSuperUser?
+                        UserVerificationStatus.VERIFIED : UserVerificationStatus.PENDING)
+                .randomIdentifier(RandomStringUtils.secureStrong().randomAlphabetic(128))
                 .build();
 
         UserDtoFull response = new UserDtoFull();
-        BeanUtils.copyProperties(userRepository.save(userEntity), response);
-        response.setRoles(roleEntities.stream()
-                .map(RoleEntity::getRole)
-                .collect(Collectors.toSet()));
-        response.setPassword("********");
+        copyUserFromEntityMaskingPsw(userRepository.save(userEntity), response);
+
+        if(!isSuperUser) {
+            sendVerificationEmail(response);
+        }
+
         return response;
+    }
+
+    @Override
+    @Transactional(transactionManager = "userDbTransactionManager")
+    public UserDto resendVerificationMail(String mail) throws MessagingException {
+        var userFromDb = userRepository.findByMail(mail);
+        if (userFromDb == null) {
+            throw new RuntimeException("User not found in DB");
+        }
+
+        var userDto = new UserDtoFull();
+        copyUserFromEntityMaskingPsw(userFromDb, userDto);
+        sendVerificationEmail(userDto);
+
+        return userDto;
+    }
+
+    private void sendVerificationEmail(UserDtoFull user) throws MessagingException {
+        String subject = "Verifica il tuo account";
+        String verificationUrl = webAppUtils.getRootUrl() + "/user/verifyUser?userId=" + user.getId()
+                + "&userRandomIdentifier=" + user.getRandomIdentifier();
+        String htmlText = "<p>Click on the link to verify your account:</p>" +
+                "<a href=\"" + verificationUrl + "\">" + verificationUrl + "</a>";
+        emailService.sendEmail(user.getMail(), subject, htmlText, true);
+    }
+
+    @Override
+    public void verifyUser(Long userId, String userRandomIdentifier) {
+        var userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Invalid User: not found in our database."));
+
+        userEntity.setVerificationStatus(UserVerificationStatus.VERIFIED);
+        userRepository.save(userEntity);
     }
 
     @Override
@@ -110,7 +150,7 @@ public class UserFacadeImpl implements UserFacade {
             throw new RuntimeException("User not found in DB");
         }
 
-        // Reset roles before to update
+        // Reset roles before to update, can do this only if superuser to avoid one escalating it's grants!
         if (isSuperUser) {
             userFromDb.setRoles(new HashSet<>());
 
@@ -135,11 +175,7 @@ public class UserFacadeImpl implements UserFacade {
         userFromDb.setMail(userDto.getMail());
 
         UserDtoFull response = new UserDtoFull();
-        BeanUtils.copyProperties(userRepository.save(userFromDb), response);
-        response.setRoles(userFromDb.getRoles().stream()
-                .map(RoleEntity::getRole)
-                .collect(Collectors.toSet()));
-        response.setPassword("********");
+        copyUserFromEntityMaskingPsw(userRepository.save(userFromDb), response);
         return response;
     }
 
@@ -153,11 +189,7 @@ public class UserFacadeImpl implements UserFacade {
         UserDtoFull dto = new UserDtoFull();
         try {
             found.getId(); // Will throw the exception if there is no entity found
-            BeanUtils.copyProperties(found, dto);
-            dto.setRoles(found.getRoles().stream()
-                    .map(RoleEntity::getRole)
-                    .collect(Collectors.toSet()));
-            dto.setPassword("********");
+            copyUserFromEntityMaskingPsw(found, dto);
         } catch (EntityNotFoundException e) {
             LOGGER.error("User not found by id: {}", id);
             throw new EntityNotFoundException("User not found by id: " + id);
@@ -171,5 +203,13 @@ public class UserFacadeImpl implements UserFacade {
     @Transactional(transactionManager = "userDbTransactionManager", readOnly = true)
     public List<UserDto> getUsersByFilter(UserDto userFilter) {
         return null;
+    }
+
+    private void copyUserFromEntityMaskingPsw(UserEntity userEntity, UserDto userDto){
+        BeanUtils.copyProperties(userRepository.save(userEntity), userDto);
+        userDto.setRoles(userEntity.getRoles().stream()
+                .map(RoleEntity::getRole)
+                .collect(Collectors.toSet()));
+        userDto.setPassword("********");
     }
 }

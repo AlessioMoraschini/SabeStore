@@ -1,5 +1,6 @@
 package com.am.design.development.data.userdb.entity;
 
+import com.am.design.development.dto.UserVerificationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,11 @@ public class UserEntity {
     private Set<RoleEntity> roles = new HashSet<>();
     @Column
     private String password;
+    @Column(name = "RANDOM_IDENTIFIER")
+    String randomIdentifier;
+    @Column(name = "VERIFICATION_STATUS")
+    @Enumerated(EnumType.STRING)
+    UserVerificationStatus verificationStatus;
     @Column
     private Integer age;
 }
