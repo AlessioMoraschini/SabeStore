@@ -152,12 +152,13 @@ pipeline {
                     echo "Copying new application jar file (SabeStore-${env.PROJECT_VERSION}.jar) in the volume..."
                     sh "ls -la ${env.WORKSPACE}/SabeStore-${env.PROJECT_VERSION}.jar"
                     echo "BRANCH_NAME: ${env.BRANCH_NAME}"
-                    def jenkinsFolder = sh(script: "echo ${env.BRANCH_NAME} | sed 's|/|_|g'", returnStdout: true).trim()
-                    echo "jenkinsFolder: ${jenkinsFolder}"
-                    def jenkinsFolderFull = "workspace/pipeline_${jenkinsFolder}"
-                    def jarToCopy = "/local/${jenkinsFolderFull}/SabeStore-${env.PROJECT_VERSION}.jar"
-                    echo "jenkinsFolderFull: ${jenkinsFolderFull}"
-                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v DockerVolume:/local busybox sh -c 'ls -la /local && rm -f /app/SabeStore-${env.PROJECT_VERSION}.jar && cp ${jarToCopy} /app/'"
+                    // Save full path in variable
+                    def filePathFull = sh(script: "pwd", returnStdout: true).trim() + "/SabeStore-${env.PROJECT_VERSION}.jar"
+                    echo "The full absolute path of the copied file is: ${filePathFull}"
+                    // Save local relative path in variable
+                    def localRelativePath = sh(script: "echo ${filePathFull} | sed 's|/var/jenkins_home|/local|'", returnStdout: true).trim()
+                    echo "The local relative path of the copied file is: ${localRelativePath}"
+                    sh "docker run --rm -v AmDesignApplicationVolume:/app -v DockerVolume:/local busybox sh -c 'ls -la /local && rm -f /app/SabeStore-${env.PROJECT_VERSION}.jar && cp ${localRelativePath} /app/'"
 
                     // Restart new container on original port 8081
                     sh "docker stop ${newContainerId}"
