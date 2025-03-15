@@ -24,7 +24,7 @@ pipeline {
                        def parts = BRANCH.split('/')
                        if (parts.length > 2) {
                            // If under release we have another subpath then use it as profile
-                           env.SPRING_PROFILES_ACTIVE = parts[1] // Example: "testenvlocal"
+                           env.SPRING_PROFILES_ACTIVE = "${parts[1]}" // Example: "testenvlocal"
                            echo "Profile set to: ${env.SPRING_PROFILES_ACTIVE}"
                        } else {
                            echo "No profile subpath found. Will fall to default"
