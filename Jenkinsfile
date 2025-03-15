@@ -4,7 +4,7 @@ pipeline {
         JWT_SECRET = credentials('jwt-secret')
         SPRING_MAIL_PASSWORD = credentials('mail-password')
         BRANCH = "${env.BRANCH_NAME ?: 'main'}"
-        SPRING_PROFILES_ACTIVE = "default"
+        //SPRING_PROFILES_ACTIVE = "default"
     }
     stages {
         stage('Checkout') {
