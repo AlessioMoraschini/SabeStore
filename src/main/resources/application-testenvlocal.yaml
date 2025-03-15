@@ -5,14 +5,16 @@ spring:
     schemas: myuser
   datasource:
     user:
-      url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+      # For local run of Spring App from ide replace container name with LocalHost
+      url: jdbc:oracle:thin:@oracle-user-db:1521/XEPDB1
       jdbc-url: ${spring.datasource.user.url}
       username: myuser
       password: mypassword
       # In real life scenario password would be injected with environment property, same as JWT-SECRET
       driverClassName: oracle.jdbc.OracleDriver
     default:
-      url: jdbc:oracle:thin:@localhost:1522/XEPDB1
+      # For local run of Spring App from ide replace container name with LocalHost
+      url: jdbc:oracle:thin:@oracle-default-db:1522/XEPDB1
       jdbc-url: ${spring.datasource.default.url}
       username: myuser
       password: mypassword
