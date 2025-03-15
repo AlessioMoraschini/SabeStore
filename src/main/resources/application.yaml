@@ -5,13 +5,13 @@ spring:
     exclude: org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration
   datasource:
     user:
-      url: jdbc:h2:mem:userDB
+      url: jdbc:h2:mem:userDB;MODE=Oracle;
       jdbc-url: ${spring.datasource.user.url}
       username: sa
       password: psxSabeSt0re
       driverClassName: org.h2.Driver
     default:
-      url: jdbc:h2:mem:defaultDB
+      url: jdbc:h2:mem:defaultDB;MODE=Oracle;
       jdbc-url: ${spring.datasource.default.url}
       username: sa
       password: psxSabeSt0reDefault

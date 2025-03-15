@@ -39,9 +39,12 @@ Actuator url: http://localhost:8080/actuator
 3. #### Create Volumes for maven and Jenkins to persist data
     ``` docker volume create maven-repo ```
     ``` docker volume create DockerVolume ```
-4. #### Create custom network for the containers
+4. #### Create Volumes for User and Default DB storage
+    ``` docker volume create UserDatabase ```
+    ``` docker volume create DefaultDatabase ```
+5. #### Create custom network for the containers
     ``` docker network create mynetwork ```
-5. #### Create Docker image for jenkins
+6. #### Create Docker image for jenkins
    ```
     FROM jenkins/jenkins:lts 
     USER root
@@ -51,7 +54,7 @@ Actuator url: http://localhost:8080/actuator
       ```
    Enter the folder in which the Dockerfile is located and run the following command:
    ``` docker build -t jenkins-docker . ```
-6.  #### Run Jenkins Container
+7.  #### Run Jenkins Container
    ```
    docker run --privileged -d -u root -p 8080:8080 -p 50000:50000 --name jenkins --network mynetwork -v DockerVolume:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock jenkins-docker
    ``` 
@@ -66,7 +69,7 @@ Actuator url: http://localhost:8080/actuator
    docker exec -it jenkins /bin/bash
    docker run hello-world
    ```
-7. #### Configure Jenkins 
+8. #### Configure Jenkins 
    Install plugins: 
    * Git Plugin
    * Pipeline Plugin
@@ -75,16 +78,51 @@ Actuator url: http://localhost:8080/actuator
    * Configure the pipeline with the script defined in Jenkinsfile
    * Configure the pipeline to use git https URL, and exclude unused branches (e.g. keep only "main release*")
    * define credentials for jwt-secret (used in pipeline, see Jenkinsfile)
-8. #### Run the pipeline 
+8. #### Create and Run Database containers
+   Get the Oracle XE image
+   
+   ```docker pull gvenzl/oracle-xe```
+ 
+   Now create a file named createUser.sql under "C:\Scripts" with the following content:
+   ```
+   CREATE USER myuser IDENTIFIED BY mypassword;
+   GRANT CREATE SESSION TO myuser;
+   GRANT CONNECT TO myuser;
+   GRANT SELECT ANY TABLE TO myuser;
+   GRANT CREATE ANY TABLE TO myuser;
+   GRANT CREATE VIEW TO myuser;
+   GRANT CREATE SEQUENCE TO myuser;
+   GRANT UPDATE ANY TABLE TO myuser;
+   GRANT INSERT ANY TABLE TO myuser;
+   ALTER USER myuser QUOTA 500M ON users;
+   ```
+ 
+   Now run them and run the script above
+
+   1. User DB
+      ```docker run -d --name oracle-user-db --network mynetwork -p 1521:1521 -p 5500:5500 -e ORACLE_PASSWORD=YOUR_PASSWORD_HERE -v UserDatabase:/opt/oracle/oradata -v C:/Scripts:/scripts gvenzl/oracle-xe```
+      And then after the DB is fully started (you'll see DATA BASE IS READY TO USE in the container logs)
+      ```docker exec -it oracle-user-db sh -c "sqlplus sys/YOUR_PASSWORD_HERE@localhost:1521/XEPDB1 as sysdba @/scripts/createUser.sql"```
+   2. Default DB
+      ```docker run -d --name oracle-default-db --network mynetwork -p 1522:1521 -p 5501:5500 -e ORACLE_PASSWORD=YOUR_OTHER_PASSWORD_HERE -v DefaultDatabase:/opt/oracle/oradata -v C:/Scripts:/scripts gvenzl/oracle-xe```
+      And then after the DB is fully started (you'll see DATA BASE IS READY TO USE in the container logs)
+      ```docker exec -it oracle-default-db sh -c "sqlplus sys/YOUR_OTHER_PASSWORD_HERE@localhost:1521/XEPDB1 as sysdba @/scripts/createUser.sql"```
+      
+   3. As defined above and in application-testenvlocal.yaml, for simplicity in the local docker test env we use myuser user and mypassword.
+      You can also connect with the software you'd like in order to view data or insert/modify anything, like DBeaver.
+      Jdbc connection string is: 
+      User-DB ```jdbc:oracle:thin:@localhost:1521/XEPDB1```
+      Default-DB ```jdbc:oracle:thin:@localhost:1522/XEPDB1```
+9. #### Run the pipeline 
    it should build the software, the image, and deploy the latest replacing the existing one!  
 
-9. #### Security and authentication/authorization
+10. #### Security and authentication/authorization
    * security can be enabled/disabled using jvm args  ```-Dsecurity.enabled=true```
    * if enabled, security allows to login using the mail/password (crypted with Bcrypt) set in user database.  
    Just call the /login endpoint with username(mail) and password(plain text) matching a valid entry in the DB to receive back a 200 response with Authorization header.
    Then you can use that header in the following requests to be recognized as logged in user. Then, depending on the associated role you can be authorized or not for the various endpoints.
    
-10. 
+11.
 
    
 

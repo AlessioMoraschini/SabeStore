@@ -1,0 +1,42 @@
+# this configuration is the default one containing many test environment configs.
+# If you need to setup a qa or production environment, create a new profile and override the settings you need.
+spring:
+  flyway:
+    schemas: myuser
+  datasource:
+    user:
+      url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+      jdbc-url: ${spring.datasource.user.url}
+      username: myuser
+      password: mypassword
+      # In real life scenario password would be injected with environment property, same as JWT-SECRET
+      driverClassName: oracle.jdbc.OracleDriver
+    default:
+      url: jdbc:oracle:thin:@localhost:1522/XEPDB1
+      jdbc-url: ${spring.datasource.default.url}
+      username: myuser
+      password: mypassword
+      # In real life scenario password would be injected with environment property, same as JWT-SECRET
+      driverClassName: oracle.jdbc.OracleDriver
+
+  jpa:
+    properties:
+        hibernate:
+          format_sql: true
+          dialect: org.hibernate.dialect.OracleDialect
+    database-platform: org.hibernate.dialect.OracleDialect
+
+security:
+  corsAllowedOrigins:
+    - # Frontend base url
+    - "http://localhost:3000"
+
+logging:
+  level:
+    root: info
+    web: info
+    sql: debug
+#    org.hibernate: trace
+#    org.springframework.boot: DEBUG
+#    org.springframework.core.env: DEBUG
+#    org.springframework: DEBUG

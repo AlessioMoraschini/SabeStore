@@ -4,6 +4,7 @@ pipeline {
         JWT_SECRET = credentials('jwt-secret')
         SPRING_MAIL_PASSWORD = credentials('mail-password')
         BRANCH = "${env.BRANCH_NAME ?: 'main'}"
+        SPRING_PROFILES_ACTIVE = "default"
     }
     stages {
         stage('Checkout') {
@@ -11,6 +12,26 @@ pipeline {
                 script {
                     sh 'ls -la'
                     git branch: "${BRANCH}", url: 'https://github.com/AlessioMoraschini/SabeStore.git'
+                }
+            }
+        }
+        stage('setProfile') {
+            steps {
+                script {
+                   // checks if branch starts with "release/"
+                   if (BRANCH.startsWith('release/')) {
+                       // extract subpath of release
+                       def parts = BRANCH.split('/')
+                       if (parts.length > 2) {
+                           // If under release we have another subpath then use it as profile
+                           env.SPRING_PROFILES_ACTIVE = parts[1] // Example: "testenvlocal"
+                           echo "Profile set to: ${env.SPRING_PROFILES_ACTIVE}"
+                       } else {
+                           echo "No profile subpath found. Will fall to default"
+                       }
+                   } else {
+                       echo "Not a release branch. No profile set."
+                   }
                 }
             }
         }
@@ -48,6 +69,8 @@ pipeline {
             }
             steps {
                 script {
+                    echo "Deploying container with profile: ${SPRING_PROFILES_ACTIVE}"
+
                     // Fond ID of the container in execution on port 8082
                     def oldTempContainerId = sh(script: "docker ps --filter publish=8082 | grep '0.0.0.0:8082->8082/tcp' | awk '{print \$1}'", returnStdout: true).trim()
                     // If found, stop and remove it
@@ -58,7 +81,7 @@ pipeline {
 
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
                     echo "Deploying Docker image: ${imageName}"
-                    def newContainerId = sh(script: "docker run -e JWT_SECRET=${JWT_SECRET} -e SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}", returnStdout: true).trim()
+                    def newContainerId = sh(script: "docker run -e JWT_SECRET=${JWT_SECRET} -e SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} -e SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}", returnStdout: true).trim()
                     echo "New container started with ID: ${newContainerId} on port 8082"
                     writeFile file: 'newContainerId.txt', text: newContainerId
                 }
@@ -80,6 +103,7 @@ pipeline {
                             sh 'curl http://sabestoreLatest:8082/actuator/health'
                             newContainerRunning = true
                         } catch (Exception e) {
+                            echo "Health check failed. Error: ${e.message}"
                             echo "New container is not yet available. Waiting ${waitTime} seconds..."
                             sleep(waitTime)
                             attempts++
@@ -138,7 +162,7 @@ pipeline {
                     // Restart new container on original port 8081
                     sh "docker stop ${newContainerId}"
                     sh "docker rm ${newContainerId}"
-                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -e SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name ${imageNameContainer} ${imageName}"
+                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -e SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} -e SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name ${imageNameContainer} ${imageName}"
                 }
             }
         }

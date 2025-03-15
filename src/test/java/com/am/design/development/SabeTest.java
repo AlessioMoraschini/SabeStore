@@ -1,5 +1,6 @@
 package com.am.design.development;
 
+import com.am.design.development.dto.AppProfiles;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -11,6 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles(AppProfiles.TEST_JUNIT)
 public @interface SabeTest {
 }
