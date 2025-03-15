@@ -50,6 +50,9 @@ public class MailConfig {
         // Carica il certificato dal file
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         InputStream certStream = getClass().getResourceAsStream("/cert/mail.crt");
+        if (certStream == null) {
+            throw new RuntimeException("Certificate not found: /cert/mail.crt");
+        }
         X509Certificate caCert = (X509Certificate) cf.generateCertificate(certStream);
 
         // Crea un keystore e aggiungi il certificato
