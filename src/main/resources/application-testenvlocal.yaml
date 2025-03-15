@@ -6,7 +6,7 @@ spring:
   datasource:
     user:
       # For local run of Spring App from ide replace container name with LocalHost
-      url: jdbc:oracle:thin:@oracle-user-db:1521:XE
+      url: jdbc:oracle:thin:@userdb:1521/XEPDB1
       jdbc-url: ${spring.datasource.user.url}
       username: myuser
       password: mypassword
@@ -14,7 +14,7 @@ spring:
       driverClassName: oracle.jdbc.OracleDriver
     default:
       # For local run of Spring App from ide replace container name with LocalHost
-      url: jdbc:oracle:thin:@oracle-default-db:1522:XE
+      url: jdbc:oracle:thin:@defaultdb:1522/XEPDB1
       jdbc-url: ${spring.datasource.default.url}
       username: myuser
       password: mypassword

@@ -100,11 +100,11 @@ Actuator url: http://localhost:8080/actuator
    Now run them and run the script above
 
    1. User DB
-      ```docker run -d --name oracle-user-db --network mynetwork -p 1521:1521 -p 5500:5500 -e ORACLE_PASSWORD=YOUR_PASSWORD_HERE -v UserDatabase:/opt/oracle/oradata -v C:/Scripts:/scripts gvenzl/oracle-xe```
+      ```docker run -d --name oracle-user-db --network mynetwork --hostname userdb -p 1521:1521 -p 5500:5500 -e ORACLE_PASSWORD=YOUR_PASSWORD_HERE -v UserDatabase:/opt/oracle/oradata -v C:/Scripts:/scripts gvenzl/oracle-xe```
       And then after the DB is fully started (you'll see DATA BASE IS READY TO USE in the container logs)
       ```docker exec -it oracle-user-db sh -c "sqlplus sys/YOUR_PASSWORD_HERE@localhost:1521/XEPDB1 as sysdba @/scripts/createUser.sql"```
    2. Default DB
-      ```docker run -d --name oracle-default-db --network mynetwork -p 1522:1521 -p 5501:5500 -e ORACLE_PASSWORD=YOUR_OTHER_PASSWORD_HERE -v DefaultDatabase:/opt/oracle/oradata -v C:/Scripts:/scripts gvenzl/oracle-xe```
+      ```docker run -d --name oracle-default-db --network mynetwork --hostname defaultdb -p 1522:1521 -p 5501:5500 -e ORACLE_PASSWORD=YOUR_OTHER_PASSWORD_HERE -v DefaultDatabase:/opt/oracle/oradata -v C:/Scripts:/scripts gvenzl/oracle-xe```
       And then after the DB is fully started (you'll see DATA BASE IS READY TO USE in the container logs)
       ```docker exec -it oracle-default-db sh -c "sqlplus sys/YOUR_OTHER_PASSWORD_HERE@localhost:1521/XEPDB1 as sysdba @/scripts/createUser.sql"```
       
