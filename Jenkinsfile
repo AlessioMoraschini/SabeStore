@@ -80,8 +80,8 @@ pipeline {
                     }
 
                     def imageName = "sabestore:${env.PROJECT_VERSION}"
-                    echo "Deploying Docker image: ${imageName} with SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}/${env.SPRING_PROFILES_ACTIVE}"
-                    def newContainerId = sh(script: "docker run -e JWT_SECRET=${JWT_SECRET} -e SPRING_PROFILES_ACTIVE=${env.SPRING_PROFILES_ACTIVE} -e SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD} -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}", returnStdout: true).trim()
+                    echo "Deploying Docker image: ${imageName} with SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}"
+                    def newContainerId = sh(script: "docker run -e \"JWT_SECRET=${JWT_SECRET}\" -e \"SPRING_PROFILES_ACTIVE=${env.SPRING_PROFILES_ACTIVE}\" -e \"SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}\" -d -p 8082:8082 --name sabestoreLatest --network mynetwork -e SERVER_PORT=8082 ${imageName}", returnStdout: true).trim()
                     echo "New container started with ID: ${newContainerId} on port 8082"
                     writeFile file: 'newContainerId.txt', text: newContainerId
                 }
@@ -162,7 +162,7 @@ pipeline {
                     // Restart new container on original port 8081
                     sh "docker stop ${newContainerId}"
                     sh "docker rm ${newContainerId}"
-                    sh "docker run -e JWT_SECRET=${JWT_SECRET} -e SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} -e SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD} -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name ${imageNameContainer} ${imageName}"
+                    sh "docker run -e \"JWT_SECRET=${JWT_SECRET}\" -e \"SPRING_PROFILES_ACTIVE=${env.SPRING_PROFILES_ACTIVE}\" -e \"SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}\" -d -p 8081:8081 -e SERVER_PORT=8081 -v AmDesignApplicationVolume:/app --network mynetwork --name ${imageNameContainer} ${imageName}"
                 }
             }
         }
