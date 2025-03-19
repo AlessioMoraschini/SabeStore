@@ -118,11 +118,17 @@ Actuator url: http://localhost:8080/actuator
 
 10. #### Security and authentication/authorization
    * security can be enabled/disabled using jvm args  ```-Dsecurity.enabled=true```
+   * other params you have to specify as environment args are  ```SERVER_PORT=8083;JWT_SECRET=XXXXXXXX```
    * if enabled, security allows to login using the mail/password (crypted with Bcrypt) set in user database.  
    Just call the /login endpoint with username(mail) and password(plain text) matching a valid entry in the DB to receive back a 200 response with Authorization header.
    Then you can use that header in the following requests to be recognized as logged in user. Then, depending on the associated role you can be authorized or not for the various endpoints.
    
-11.
+11. #### Profiles and other arguments
+   Supported Profiles are defined in AppProfiles.java.
+   Other properties are:
+   * ```-Dspring.profiles.active=testenvlocal``` specify active profile
+   * ```-Dspring.mail.password=xaaxasxasaxsxa``` specify password to connect to the mail
+   * ```-Dlogging.file.name=``` empty to disable file logging, or specify the full path and name
 
    
 

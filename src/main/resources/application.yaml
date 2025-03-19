@@ -76,6 +76,8 @@ security:
     - /login
     - /user/createUser
     - /user/verifyUser
+    - /user/resendVerificationMail
+    - /SabeStoreTest/**
     - /h2-console/**
   corsAllowedOrigins:
     - "http://localhost:3000"

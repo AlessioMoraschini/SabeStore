@@ -1,12 +1,17 @@
 # this configuration is the default one containing many test environment configs.
 # If you need to setup a qa or production environment, create a new profile and override the settings you need.
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration
+      - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
   flyway:
     schemas: myuser
   datasource:
     user:
       # For local run of Spring App from ide replace container name with LocalHost
       url: jdbc:oracle:thin:@oracle-user-db:1521/XEPDB1
+      #url: jdbc:oracle:thin:@localhost:1521/XEPDB1
       jdbc-url: ${spring.datasource.user.url}
       username: myuser
       password: mypassword
@@ -15,6 +20,7 @@ spring:
     default:
       # For local run of Spring App from ide replace container name with LocalHost and port 1522
       url: jdbc:oracle:thin:@oracle-default-db:1521/XEPDB1
+      #url: jdbc:oracle:thin:@localhost:1522/XEPDB1
       jdbc-url: ${spring.datasource.default.url}
       username: myuser
       password: mypassword

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("SabeStore")
+@RequestMapping("SabeStoreTest")
 @SecurityRequirement(name = "bearerAuth")
 public class SabeStoreTestController {
 
