@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.NotNull;
 import jakarta.websocket.server.PathParam;
 import org.apache.commons.lang3.StringUtils;
@@ -123,12 +124,17 @@ public class SabeStoreUserController {
     @ExceptionHandler
     public ResponseEntity<String>  errorMapper(Exception exc){
 
-        return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(exc.getClass().getCanonicalName() + ": " + exc.getMessage());
+        return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(exc.getClass().getCanonicalName());
     }
     @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<String>  errorNotFoundMapper(Exception exc){
 
         return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(exc.getClass().getCanonicalName() + ": " + exc.getMessage());
+    }
+    @ExceptionHandler(value = ValidationException.class)
+    public ResponseEntity<String>  validationErrorMapper(ValidationException exc){
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(exc.getClass().getCanonicalName() + ": " + exc.getMessage());
     }
 
 }
