@@ -1,6 +1,8 @@
 package com.am.design.development.data.userdb.repository;
 
 import com.am.design.development.data.userdb.entity.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
+
+    Page<UserEntity> findAll(Pageable pageable);
 
     List<UserEntity> findByName(String name);
     List<UserEntity> findByNameAndSurname(String name, String surname);

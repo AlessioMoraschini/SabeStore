@@ -2,6 +2,8 @@ package com.am.design.development.sabestore.facade;
 
 import com.am.design.development.sabestore.dto.UserDto;
 import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -9,7 +11,7 @@ import java.util.List;
 
 public interface UserFacade {
 
-    List<UserDto>  getUsers();
+    Page<UserDto> getUsers(Pageable pageable);
     UserDto  getCurrentUserDetails(String mail);
     UserDto  addUser(UserDto userDto, boolean isSuperUser) throws MessagingException;
 
