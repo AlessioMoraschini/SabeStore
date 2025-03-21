@@ -24,7 +24,6 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -48,8 +47,6 @@ public class UserFacadeImpl implements UserFacade {
     @Override
     @Transactional(transactionManager = "userDbTransactionManager", readOnly = true)
     public Page<UserDto> getUsers(Pageable pageable) {
-        List<UserDto> userDtos = new ArrayList<>();
-
         var dbResult = userRepository.findAll(pageable);
         return dbResult.map(user -> {
             UserDtoFull dto = new UserDtoFull();
@@ -97,7 +94,7 @@ public class UserFacadeImpl implements UserFacade {
                 .mail(userDto.getMail())
                 .verificationStatus(isSuperUser?
                         UserVerificationStatus.VERIFIED : UserVerificationStatus.PENDING)
-                .randomIdentifier(RandomStringUtils.secureStrong().randomAlphabetic(128))
+                .randomIdentifier(RandomStringUtils.secureStrong().nextAlphabetic(128))
                 .build();
 
         UserDtoFull response = new UserDtoFull();
