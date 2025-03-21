@@ -48,7 +48,7 @@ public class SabeStoreUserController {
                 userFacade.getCurrentUserDetails(loggedUserMail)
         );
     }
-    @PutMapping("createUserWithGrants")
+    @PostMapping("createUserWithGrants")
     @PreAuthorize("hasRole('ROLE_SUPERUSER')")
     public ResponseEntity<UserDto> createUserWithGrants(@Valid UserDto userDto) throws MessagingException {
 
@@ -56,7 +56,7 @@ public class SabeStoreUserController {
                 userFacade.addUser(userDto, true)
         );
     }
-    @PutMapping("createUser")
+    @PostMapping("createUser")
     public ResponseEntity<UserDto> createUser(@Valid UserDto userDto) throws MessagingException {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(
@@ -84,7 +84,7 @@ public class SabeStoreUserController {
         );
     }
 
-    @PostMapping("updateUser")
+    @PutMapping("updateUser")
     @PreAuthorize("hasRole('ROLE_SUPERUSER')")
     public ResponseEntity<UserDto> updateUser(@Valid UserDto userDto) {
 
@@ -93,7 +93,7 @@ public class SabeStoreUserController {
         );
     }
 
-    @PostMapping("updateLoggedUser")
+    @PutMapping("updateLoggedUser")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<UserDto> updateLoggedUser(@Valid UserDto userDto) {
 
