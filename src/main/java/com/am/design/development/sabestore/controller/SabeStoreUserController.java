@@ -10,8 +10,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.NotNull;
 import jakarta.websocket.server.PathParam;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatusCode;
@@ -26,10 +26,10 @@ import javax.security.auth.login.AccountNotFoundException;
 @RestController
 @RequestMapping("user")
 @SecurityRequirement(name = "bearerAuth") // For swagger
+@RequiredArgsConstructor
 public class SabeStoreUserController {
 
-    @Autowired
-    private UserFacade userFacade;
+    private final UserFacade userFacade;
 
     @Operation(
             summary = "Returns the whole list of users",

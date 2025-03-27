@@ -3,16 +3,15 @@ package com.am.design.development.sabestore;
 import com.am.design.development.SabeTest;
 import com.am.design.development.data.defaultdb.repository.TestRepository;
 import com.am.design.development.data.userdb.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @SabeTest
+@RequiredArgsConstructor
 class SabeStoreApplicationTests {
 
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	TestRepository testRepository;
+	private final UserRepository userRepository;
+	private final TestRepository testRepository;
 
 	@Test
 	void contextLoads() {

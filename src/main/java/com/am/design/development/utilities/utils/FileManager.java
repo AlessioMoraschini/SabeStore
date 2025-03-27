@@ -1,15 +1,16 @@
 package com.am.design.development.utilities.utils;
 
 import com.am.design.development.utilities.impl.AmTaskExecutor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 
 @Component
+@RequiredArgsConstructor
 public class FileManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileManager.class);
@@ -18,8 +19,7 @@ public class FileManager {
     @Value("${remote_retriever.wait_ms_before_delete:30000}")
     private Integer waitMsBeforeDelete;
 
-    @Autowired
-    private AmTaskExecutor amTaskExecutor;
+    private final AmTaskExecutor amTaskExecutor;
 
 
     /**

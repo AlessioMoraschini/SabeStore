@@ -1,7 +1,7 @@
 package com.am.design.development.config;
 
 import jakarta.persistence.EntityManagerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,10 +25,10 @@ import javax.sql.DataSource;
         basePackages = "com.am.design.development.data.userdb.repository"
 )
 @EnableTransactionManagement
+@RequiredArgsConstructor
 public class UserDbConfiguration {
 
-    @Autowired
-    JpaProperties jpaProperties;
+    private final JpaProperties jpaProperties;
 
     @Bean
     @ConfigurationProperties("spring.datasource.user")

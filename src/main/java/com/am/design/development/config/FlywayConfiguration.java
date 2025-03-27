@@ -2,8 +2,8 @@ package com.am.design.development.config;
 
 import com.am.design.development.dto.AppProfiles;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.flywaydb.core.Flyway;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -11,6 +11,7 @@ import org.springframework.core.env.Environment;
 
 @Configuration
 @Profile("!" + AppProfiles.TEST_JUNIT)
+@RequiredArgsConstructor
 public class FlywayConfiguration {
 
     @Value("${spring.datasource.user.url}")
@@ -27,8 +28,7 @@ public class FlywayConfiguration {
     @Value("${spring.datasource.default.password}")
     String defaultDataSourcePassword;
 
-    @Autowired
-    Environment environment;
+    private final Environment environment;
 
     @PostConstruct
     public void migrateFlyway() {

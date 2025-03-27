@@ -1,7 +1,7 @@
 package com.am.design.development.config;
 
 import jakarta.persistence.EntityManagerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,10 +27,10 @@ import java.util.HashMap;
         basePackages = "com.am.design.development.data.defaultdb.repository"
 )
 @EnableTransactionManagement
+@RequiredArgsConstructor
 public class DefaultDbConfiguration {
 
-    @Autowired
-    JpaProperties jpaProperties;
+    private final JpaProperties jpaProperties;
 
     @Bean
     @ConfigurationProperties("spring.datasource.default")

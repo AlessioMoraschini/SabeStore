@@ -4,7 +4,7 @@ import com.am.design.development.data.userdb.repository.UserRepository;
 import com.am.design.development.security.CustomUserDetailService;
 import com.am.design.development.security.JWTAuthenticationFilter;
 import com.am.design.development.security.JWTAuthorizationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,10 +28,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @ConditionalOnProperty(prefix = "security", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableMethodSecurity // needed to setup authorization in controllers
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private SecurityProperties securityProperties;
+    private final SecurityProperties securityProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -56,7 +56,7 @@ public class SecurityConfig {
 
     @Bean
     public CustomUserDetailService customUserDetailService(UserRepository userRepository) {
-        return new CustomUserDetailService();
+        return new CustomUserDetailService(userRepository);
     }
 
     @Bean
